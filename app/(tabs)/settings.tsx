@@ -1,12 +1,12 @@
-import React from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Link } from 'expo-router';
+import React from 'react';
+import { ScrollView, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     gap: 12,
+    backgroundColor: "transparent",
   },
   iconContainer: {
     width: 40,
@@ -264,6 +265,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   settingItemRight: {
+    backgroundColor: "transparent",
     alignItems: 'center',
     justifyContent: 'center',
   },

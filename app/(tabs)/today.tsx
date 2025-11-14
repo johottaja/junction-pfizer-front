@@ -291,24 +291,13 @@ export default function TodayScreen() {
                       >
                         <IconSymbol name={action.icon as any} size={24} color={priorityColor} />
                       </ThemedView>
-                      <ThemedView style={styles.actionContent}>
-                        <ThemedText style={styles.actionTitle}>{action.title}</ThemedText>
-                        <ThemedText style={{ ...styles.actionDescription, color: theme.textSecondary }}>
+                      <ThemedView style={{ ...styles.actionContent, backgroundColor: "transparent" }}>
+                        <ThemedText style={{ ...styles.actionTitle, backgroundColor: "transparent" }}>{action.title}</ThemedText>
+                        <ThemedText style={{ ...styles.actionDescription, color: theme.textSecondary, backgroundColor: "transparent" }}>
                           {action.description}
                         </ThemedText>
                       </ThemedView>
-                      {action.priority === 'high' && (
-                        <ThemedView
-                          style={{
-                            ...styles.priorityBadge,
-                            backgroundColor: hexToRgba(priorityColor, 0.12),
-                          }}
-                        >
-                          <ThemedText style={{ ...styles.priorityText, color: priorityColor }}>
-                            High
-                          </ThemedText>
-                        </ThemedView>
-                      )}
+                      
                     </ThemedView>
                   );
                 })}
@@ -413,12 +402,14 @@ const styles = StyleSheet.create({
   },
   riskContent: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   riskHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    backgroundColor: "transparent",
   },
   riskTitle: {
     fontSize: 18,
@@ -466,11 +457,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     marginBottom: 12,
+    backgroundColor: "transparent",
   },
   factorText: {
     fontSize: 15,
     fontWeight: '500',
     flex: 1,
+    backgroundColor: "transparent",
   },
   section: {
     marginBottom: 24,
@@ -488,6 +481,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     gap: 12,
+    backgroundColor: "transparent",
   },
   actionIconContainer: {
     width: 48,
@@ -495,6 +489,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: "transparent",
   },
   actionLabel: {
     fontSize: 12,
@@ -509,19 +504,23 @@ const styles = StyleSheet.create({
   statRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: "transparent",
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: "transparent",
   },
   statValue: {
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 4,
+    backgroundColor: "transparent",
   },
   actionDescription: {
     fontSize: 13,
     lineHeight: 18,
+    backgroundColor: "transparent",
   },
   statDivider: {
     width: 1,

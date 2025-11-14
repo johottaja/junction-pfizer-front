@@ -1,12 +1,11 @@
-import React from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Platform } from 'react-native';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Helper function to add opacity to hex colors
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -69,7 +68,7 @@ export default function PredictionScreen() {
       >
         <ThemedView style={styles.header}>
           <ThemedText type="title" style={styles.title}>Predictions</ThemedText>
-          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary, backgroundColor: "transparent" }]}>
             AI-powered migraine forecasts
           </ThemedText>
         </ThemedView>
@@ -96,7 +95,7 @@ export default function PredictionScreen() {
                 ]}
               >
                 <ThemedView style={styles.predictionHeader}>
-                  <ThemedView>
+                  <ThemedView style={{ backgroundColor: "transparent" }}>
                     <ThemedText style={styles.predictionDate}>{prediction.date}</ThemedText>
                     <ThemedText style={[styles.predictionTime, { color: theme.textSecondary }]}>
                       {prediction.time}
@@ -230,48 +229,59 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    backgroundColor: "transparent",
     marginBottom: 8,
   },
   cardTitle: {
     flex: 1,
+    backgroundColor: "transparent",
   },
   cardDescription: {
     fontSize: 14,
     marginBottom: 20,
+    backgroundColor: "transparent",
   },
   predictionsList: {
     gap: 12,
+    backgroundColor: "transparent",
   },
   predictionItem: {
     padding: 18,
     borderRadius: 16,
     borderWidth: 1,
+    backgroundColor: "transparent",
   },
   predictionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
+    backgroundColor: "transparent",
   },
   predictionDate: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
+    backgroundColor: "transparent",
   },
   predictionTime: {
     fontSize: 14,
+    backgroundColor: "transparent",
   },
   riskBadge: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 16,
+    backgroundColor: "transparent",
   },
   riskText: {
     fontSize: 12,
     fontWeight: '600',
+    backgroundColor: "transparent",
   },
   probabilityContainer: {
     gap: 8,
+    backgroundColor: "transparent",
   },
   probabilityBar: {
     height: 8,
@@ -290,6 +300,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+    backgroundColor: "transparent",
   },
   statItem: {
     flex: 1,
