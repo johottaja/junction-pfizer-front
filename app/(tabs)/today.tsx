@@ -1,13 +1,11 @@
-import React from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Platform } from 'react-native';
-import { Link } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Helper function to add opacity to hex colors
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -17,9 +15,105 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// Mock API functions
+const fetchMigraineRisk = async (): Promise<{
+  riskLevel: 'low' | 'medium' | 'high';
+  riskPercentage: number;
+  factors: string[];
+  message: string;
+  timeWindow: {
+    startTime: string; // e.g., "14:00" (2:00 PM)
+    endTime: string; // e.g., "16:00" (4:00 PM)
+    duration: number; // duration in hours
+  };
+}> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Hardcoded mock response
+  return {
+    riskLevel: 'medium',
+    riskPercentage: 45,
+    factors: ['Weather changes', 'Stress levels elevated', 'Sleep quality decreased'],
+    message: 'Your migraine risk is moderate today. Consider taking preventive measures.',
+    timeWindow: {
+      startTime: '14:00',
+      endTime: '16:00',
+      duration: 2,
+    },
+  };
+};
+
+const fetchRecommendedActions = async (): Promise<{
+  actions: Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+}> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Hardcoded mock response
+  return {
+    actions: [
+      {
+        id: '1',
+        title: 'Drink Water',
+        description: 'Stay hydrated throughout the day',
+        icon: 'drop.fill',
+        priority: 'high',
+      },
+      {
+        id: '2',
+        title: 'Exercise',
+        description: 'Light exercise can help reduce stress',
+        icon: 'figure.run',
+        priority: 'high',
+      },
+      {
+        id: '3',
+        title: 'Take Breaks',
+        description: 'Rest your eyes every 20 minutes',
+        icon: 'eye.fill',
+        priority: 'medium',
+      },
+      {
+        id: '4',
+        title: 'Manage Stress',
+        description: 'Practice deep breathing exercises',
+        icon: 'lungs.fill',
+        priority: 'medium',
+      },
+    ],
+  };
+};
+
 export default function TodayScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+
+  const [riskData, setRiskData] = useState<{
+    riskLevel: 'low' | 'medium' | 'high';
+    riskPercentage: number;
+    factors: string[];
+    message: string;
+    timeWindow: {
+      startTime: string;
+      endTime: string;
+      duration: number;
+    };
+  } | null>(null);
+  const [recommendedActions, setRecommendedActions] = useState<Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    priority: 'high' | 'medium' | 'low';
+  }>>([]);
+  const [loading, setLoading] = useState(true);
 
   // Get today's date
   const today = new Date();
@@ -27,134 +121,201 @@ export default function TodayScreen() {
   const monthName = today.toLocaleDateString('en-US', { month: 'long' });
   const dayNumber = today.getDate();
 
-  // Mock data - will be replaced with actual data
-  const todayStats = {
-    hasMigraine: false,
-    lastEpisode: '3 days ago',
-    streak: 3,
-    weeklyAverage: 2.5,
-  };
-
-  const quickActions = [
-    { icon: 'plus.circle.fill', label: 'Report Migraine', route: '/(tabs)/report', color: theme.primary },
-    { icon: 'chart.line.uptrend.xyaxis', label: 'View Predictions', route: '/(tabs)/prediction', color: theme.secondary },
-  ];
-
   const recentActivity = [
     { time: '2 days ago', intensity: 7, trigger: 'Stress' },
     { time: '5 days ago', intensity: 5, trigger: 'Sleep' },
     { time: '1 week ago', intensity: 8, trigger: 'Weather' },
   ];
 
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [riskResponse, actionsResponse] = await Promise.all([
+          fetchMigraineRisk(),
+          fetchRecommendedActions(),
+        ]);
+        setRiskData(riskResponse);
+        setRecommendedActions(actionsResponse.actions);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const getRiskColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'high':
+        return theme.error;
+      case 'medium':
+        return theme.warning;
+      case 'low':
+        return theme.success;
+      default:
+        return theme.textSecondary;
+    }
+  };
+
+  const getRiskIcon = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'high':
+        return 'exclamationmark.triangle.fill';
+      case 'medium':
+        return 'exclamationmark.circle.fill';
+      case 'low':
+        return 'checkmark.circle.fill';
+      default:
+        return 'info.circle.fill';
+    }
+  };
+
+  const formatTimeWindow = (startTime: string, endTime: string, duration: number): string => {
+    // Convert 24-hour format to 12-hour format
+    const formatTime = (time24: string): string => {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    };
+
+    const start = formatTime(startTime);
+    const end = formatTime(endTime);
+    return `${start} - ${end} (${duration} ${duration === 1 ? 'hour' : 'hours'})`;
+  };
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+    <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <ThemedView style={styles.header}>
-          <ThemedText style={[styles.greeting, { color: theme.textSecondary }]}>Today</ThemedText>
+          <ThemedText style={{ ...styles.greeting, color: theme.textSecondary }}>Today</ThemedText>
           <ThemedText type="title" style={styles.dateTitle}>
             {dayName}, {monthName} {dayNumber}
           </ThemedText>
         </ThemedView>
 
-        {todayStats.hasMigraine ? (
-          <ThemedView
-            style={{
-              ...styles.alertCard,
-              backgroundColor: hexToRgba(theme.error, 0.08),
-              borderColor: hexToRgba(theme.error, 0.25),
-            }}
-          >
-            <IconSymbol name="exclamationmark.triangle.fill" size={24} color={theme.error} />
-            <ThemedView style={styles.alertContent}>
-              <ThemedText style={[styles.alertTitle, { color: theme.error }]}>
-                Active Migraine
-              </ThemedText>
-              <ThemedText style={[styles.alertText, { color: theme.textSecondary }]}>
-                You reported a migraine today. Track your symptoms and triggers.
-              </ThemedText>
-            </ThemedView>
+        {loading ? (
+          <ThemedView style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={theme.primary} />
+            <ThemedText style={{ ...styles.loadingText, color: theme.textSecondary }}>
+              Loading your risk assessment...
+            </ThemedText>
           </ThemedView>
         ) : (
-          <ThemedView
-            style={{
-              ...styles.statusCard,
-              backgroundColor: hexToRgba(theme.success, 0.08),
-              borderColor: hexToRgba(theme.success, 0.25),
-            }}
-          >
-            <IconSymbol name="checkmark.circle.fill" size={24} color={theme.success} />
-            <ThemedView style={styles.statusContent}>
-              <ThemedText style={[styles.statusTitle, { color: theme.success }]}>
-                No Migraine Today
-              </ThemedText>
-              <ThemedText style={[styles.statusText, { color: theme.textSecondary }]}>
-                Last episode was {todayStats.lastEpisode}
-              </ThemedText>
-            </ThemedView>
-          </ThemedView>
-        )}
-
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Quick Actions</ThemedText>
-          <ThemedView style={styles.actionsGrid}>
-            {quickActions.map((action, index) => {
-              const actionCardStyle = {
-                ...styles.actionCard,
-                backgroundColor: theme.card,
-                borderColor: theme.cardBorder,
-              };
-              const iconContainerStyle = {
-                ...styles.actionIconContainer,
-                backgroundColor: hexToRgba(action.color, 0.12),
-              };
-              return (
-                <Link key={index} href={action.route} asChild>
-                  <TouchableOpacity style={actionCardStyle}>
-                    <ThemedView style={iconContainerStyle}>
-                      <IconSymbol name={action.icon} size={24} color={action.color} />
+          <>
+            {riskData && (
+              <ThemedView
+                style={{
+                  ...styles.riskCard,
+                  backgroundColor: hexToRgba(getRiskColor(riskData.riskLevel), 0.08),
+                  borderColor: hexToRgba(getRiskColor(riskData.riskLevel), 0.25),
+                }}
+              >
+                <IconSymbol name={getRiskIcon(riskData.riskLevel)} size={28} color={getRiskColor(riskData.riskLevel)} />
+                <ThemedView style={styles.riskContent}>
+                  <ThemedView style={styles.riskHeader}>
+                    <ThemedText style={{ ...styles.riskTitle, color: getRiskColor(riskData.riskLevel) }}>
+                      {riskData.riskLevel.charAt(0).toUpperCase() + riskData.riskLevel.slice(1)} Risk Today
+                    </ThemedText>
+                    <ThemedText style={{ ...styles.riskPercentage, color: getRiskColor(riskData.riskLevel) }}>
+                      {riskData.riskPercentage}%
+                    </ThemedText>
+                  </ThemedView>
+                  <ThemedText style={{ ...styles.riskMessage, color: theme.text }}>
+                    {riskData.message}
+                  </ThemedText>
+                  <ThemedView style={styles.timeWindowContainer}>
+                    <IconSymbol name="clock.fill" size={16} color={getRiskColor(riskData.riskLevel)} />
+                    <ThemedView style={styles.timeWindowContent}>
+                      <ThemedText style={{ ...styles.timeWindowLabel, color: theme.text }}>
+                        Most likely time window:
+                      </ThemedText>
+                      <ThemedText style={{ ...styles.timeWindowValue, color: getRiskColor(riskData.riskLevel) }}>
+                        {formatTimeWindow(riskData.timeWindow.startTime, riskData.timeWindow.endTime, riskData.timeWindow.duration)}
+                      </ThemedText>
                     </ThemedView>
-                    <ThemedText style={styles.actionLabel}>{action.label}</ThemedText>
-                  </TouchableOpacity>
-                </Link>
-              );
-            })}
-          </ThemedView>
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Today's Stats</ThemedText>
-          <ThemedView
-            style={{
-              ...styles.statsCard,
-              backgroundColor: theme.card,
-              borderColor: theme.cardBorder,
-            }}
-          >
-            <ThemedView style={styles.statRow}>
-              <ThemedView style={styles.statItem}>
-                <ThemedText style={[styles.statValue, { color: theme.primary }]}>
-                  {todayStats.streak}
-                </ThemedText>
-                <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
-                  Day Streak
-                </ThemedText>
+                  </ThemedView>
+                </ThemedView>
               </ThemedView>
-              <ThemedView style={[styles.statDivider, { backgroundColor: theme.border }]} />
-              <ThemedView style={styles.statItem}>
-                <ThemedText style={[styles.statValue, { color: theme.secondary }]}>
-                  {todayStats.weeklyAverage}
-                </ThemedText>
-                <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
-                  Weekly Avg
-                </ThemedText>
+            )}
+
+            {riskData && riskData.factors.length > 0 && (
+              <ThemedView style={styles.section}>
+                <ThemedText type="subtitle" style={styles.sectionTitle}>Contributing Factors</ThemedText>
+                <ThemedView
+                  style={{
+                    ...styles.factorsCard,
+                    backgroundColor: theme.card,
+                    borderColor: theme.cardBorder,
+                  }}
+                >
+                  {riskData.factors.map((factor, index) => (
+                    <ThemedView key={index} style={styles.factorItem}>
+                      <IconSymbol name="circle.fill" size={6} color={getRiskColor(riskData.riskLevel)} />
+                      <ThemedText style={{ ...styles.factorText, color: theme.text }}>
+                        {factor}
+                      </ThemedText>
+                    </ThemedView>
+                  ))}
+                </ThemedView>
+              </ThemedView>
+            )}
+
+            <ThemedView style={styles.section}>
+              <ThemedText type="subtitle" style={styles.sectionTitle}>Recommended Actions</ThemedText>
+              <ThemedView style={styles.actionsList}>
+                {recommendedActions.map((action) => {
+                  const priorityColor = action.priority === 'high' ? theme.primary : theme.secondary;
+                  return (
+                    <ThemedView
+                      key={action.id}
+                      style={{
+                        ...styles.actionItem,
+                        backgroundColor: theme.card,
+                        borderColor: theme.cardBorder,
+                      }}
+                    >
+                      <ThemedView
+                        style={{
+                          ...styles.actionIconContainer,
+                          backgroundColor: hexToRgba(priorityColor, 0.12),
+                        }}
+                      >
+                        <IconSymbol name={action.icon as any} size={24} color={priorityColor} />
+                      </ThemedView>
+                      <ThemedView style={styles.actionContent}>
+                        <ThemedText style={styles.actionTitle}>{action.title}</ThemedText>
+                        <ThemedText style={{ ...styles.actionDescription, color: theme.textSecondary }}>
+                          {action.description}
+                        </ThemedText>
+                      </ThemedView>
+                      {action.priority === 'high' && (
+                        <ThemedView
+                          style={{
+                            ...styles.priorityBadge,
+                            backgroundColor: hexToRgba(priorityColor, 0.12),
+                          }}
+                        >
+                          <ThemedText style={{ ...styles.priorityText, color: priorityColor }}>
+                            High
+                          </ThemedText>
+                        </ThemedView>
+                      )}
+                    </ThemedView>
+                  );
+                })}
               </ThemedView>
             </ThemedView>
-          </ThemedView>
-        </ThemedView>
+          </>
+        )}
 
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>Recent Activity</ThemedText>
@@ -231,47 +392,84 @@ const styles = StyleSheet.create({
   dateTitle: {
     fontSize: 28,
   },
-  alertCard: {
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    marginBottom: 24,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  riskCard: {
     flexDirection: 'row',
     padding: 20,
     borderRadius: 20,
     borderWidth: 1,
     marginBottom: 24,
-    gap: 14,
+    gap: 16,
     alignItems: 'flex-start',
   },
-  alertContent: {
+  riskContent: {
     flex: 1,
   },
-  alertTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+  riskHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  alertText: {
+  riskTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  riskPercentage: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  riskMessage: {
     fontSize: 14,
     lineHeight: 20,
+    marginBottom: 12,
   },
-  statusCard: {
+  timeWindowContainer: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginTop: 12,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+  },
+  timeWindowContent: {
+    flex: 1,
+  },
+  timeWindowLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  timeWindowValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  factorsCard: {
     padding: 20,
     borderRadius: 20,
     borderWidth: 1,
-    marginBottom: 24,
-    gap: 14,
-    alignItems: 'flex-start',
   },
-  statusContent: {
+  factorItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  factorText: {
+    fontSize: 15,
+    fontWeight: '500',
     flex: 1,
-  },
-  statusTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  statusText: {
-    fontSize: 14,
-    lineHeight: 20,
   },
   section: {
     marginBottom: 24,
@@ -279,57 +477,45 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginBottom: 12,
   },
-  actionsGrid: {
-    flexDirection: 'row',
+  actionsList: {
     gap: 12,
-    flexWrap: 'wrap',
   },
-  actionCard: {
-    flex: 1,
-    minWidth: '30%',
-    padding: 18,
-    borderRadius: 20,
-    borderWidth: 1,
+  actionItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
   },
   actionIconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  statsCard: {
-    padding: 24,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  statRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statItem: {
+  actionContent: {
     flex: 1,
-    alignItems: 'center',
   },
-  statValue: {
-    fontSize: 32,
-    fontWeight: '700',
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
     marginBottom: 4,
   },
-  statLabel: {
-    fontSize: 14,
+  actionDescription: {
+    fontSize: 13,
+    lineHeight: 18,
   },
-  statDivider: {
-    width: 1,
-    height: 40,
-    marginHorizontal: 20,
+  priorityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  priorityText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   activityCard: {
     padding: 24,
