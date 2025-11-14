@@ -235,11 +235,11 @@ const styles = StyleSheet.create({
   },
   alertCard: {
     flexDirection: 'row',
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
     marginBottom: 24,
-    gap: 12,
+    gap: 14,
     alignItems: 'flex-start',
   },
   alertContent: {
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
   },
   statusCard: {
     flexDirection: 'row',
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
     marginBottom: 24,
-    gap: 12,
+    gap: 14,
     alignItems: 'flex-start',
   },
   statusContent: {
@@ -289,17 +289,17 @@ const styles = StyleSheet.create({
   actionCard: {
     flex: 1,
     minWidth: '30%',
-    padding: 16,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.03,
+        shadowRadius: 8,
       },
       android: {
         elevation: 1,
@@ -307,9 +307,9 @@ const styles = StyleSheet.create({
     }),
   },
   actionIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -319,18 +319,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   statsCard: {
-    padding: 20,
-    borderRadius: 12,
+    padding: 24,
+    borderRadius: 20,
     borderWidth: 1,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOpacity: 0.03,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
@@ -356,18 +356,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   activityCard: {
-    padding: 20,
-    borderRadius: 12,
+    padding: 24,
+    borderRadius: 20,
     borderWidth: 1,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOpacity: 0.03,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
@@ -383,9 +383,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },

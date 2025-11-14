@@ -6,24 +6,24 @@
 
 import { Platform } from 'react-native';
 
-// Primary theme colors - change these to customize the app appearance
-const primaryColor = '#6366F1'; // Indigo
-const primaryDark = '#4F46E5';
-const secondaryColor = '#8B5CF6'; // Purple
-const accentColor = '#EC4899'; // Pink
+// Primary theme colors - soft, calming palette for migraine prevention
+const primaryColor = '#017173'; // Teal
+const primaryDark = '#0F2E28'; // Dark teal background
+const secondaryColor = '#88CCC5'; // Light teal
+const accentColor = '#60DDAC'; // Mint green
 
 // Neutral colors
 const tintColorLight = primaryColor;
-const tintColorDark = '#A5B4FC';
+const tintColorDark = secondaryColor;
 
 export const Colors = {
   light: {
     // Base colors
-    text: '#1F2937',
-    textSecondary: '#6B7280',
-    background: '#FFFFFF',
-    backgroundSecondary: '#F9FAFB',
-    border: '#E5E7EB',
+    text: '#0F2E28',
+    textSecondary: '#017173',
+    background: '#F4F4F4',
+    backgroundSecondary: '#FFFFFF',
+    border: '#88CCC5',
     
     // Primary colors
     primary: primaryColor,
@@ -33,59 +33,59 @@ export const Colors = {
     
     // UI colors
     tint: tintColorLight,
-    icon: '#6B7280',
-    tabIconDefault: '#9CA3AF',
+    icon: '#017173',
+    tabIconDefault: '#88CCC5',
     tabIconSelected: tintColorLight,
     
-    // Status colors
-    success: '#10B981',
-    warning: '#F59E0B',
-    error: '#EF4444',
-    info: '#3B82F6',
+    // Status colors - softer versions
+    success: '#60DDAC',
+    warning: '#88CCC5',
+    error: '#88CCC5', // Softer error color
+    info: '#017173',
     
     // Card colors
     card: '#FFFFFF',
-    cardBorder: '#E5E7EB',
+    cardBorder: '#88CCC5',
     
     // Input colors
-    inputBackground: '#F9FAFB',
-    inputBorder: '#D1D5DB',
+    inputBackground: '#FFFFFF',
+    inputBorder: '#88CCC5',
     inputFocus: primaryColor,
   },
   dark: {
-    // Base colors
-    text: '#F9FAFB',
-    textSecondary: '#D1D5DB',
-    background: '#111827',
-    backgroundSecondary: '#1F2937',
-    border: '#374151',
+    // Base colors - using the dark teal background as default
+    text: '#F4F4F4',
+    textSecondary: '#88CCC5',
+    background: '#0F2E28',
+    backgroundSecondary: '#017173',
+    border: '#88CCC5',
     
     // Primary colors
-    primary: tintColorDark,
-    primaryDark: '#818CF8',
-    secondary: '#A78BFA',
-    accent: '#F472B6',
+    primary: secondaryColor,
+    primaryDark: primaryDark,
+    secondary: accentColor,
+    accent: accentColor,
     
     // UI colors
     tint: tintColorDark,
-    icon: '#9CA3AF',
-    tabIconDefault: '#6B7280',
+    icon: '#88CCC5',
+    tabIconDefault: '#60DDAC',
     tabIconSelected: tintColorDark,
     
-    // Status colors
-    success: '#34D399',
-    warning: '#FBBF24',
-    error: '#F87171',
-    info: '#60A5FA',
+    // Status colors - softer versions
+    success: '#60DDAC',
+    warning: '#88CCC5',
+    error: '#88CCC5', // Softer error color
+    info: '#88CCC5',
     
     // Card colors
-    card: '#1F2937',
-    cardBorder: '#374151',
+    card: '#017173',
+    cardBorder: '#88CCC5',
     
     // Input colors
-    inputBackground: '#1F2937',
-    inputBorder: '#4B5563',
-    inputFocus: tintColorDark,
+    inputBackground: '#017173',
+    inputBorder: '#88CCC5',
+    inputFocus: secondaryColor,
   },
 };
 

@@ -193,19 +193,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   section: {
-    padding: 20,
-    borderRadius: 16,
+    padding: 24,
+    borderRadius: 20,
     borderWidth: 1,
     marginBottom: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOpacity: 0.03,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
@@ -222,9 +222,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   intensityButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -239,9 +239,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 24,
     borderWidth: 1,
   },
   chipText: {
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   submitButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    borderRadius: 20,
     alignItems: 'center',
     marginTop: 8,
   },

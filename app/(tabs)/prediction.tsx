@@ -213,19 +213,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    padding: 20,
-    borderRadius: 16,
+    padding: 24,
+    borderRadius: 20,
     borderWidth: 1,
     marginBottom: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        shadowOpacity: 0.03,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
@@ -246,8 +246,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   predictionItem: {
-    padding: 16,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 16,
     borderWidth: 1,
   },
   predictionHeader: {
@@ -265,9 +265,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   riskBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
   },
   riskText: {
     fontSize: 12,
@@ -277,8 +277,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   probabilityBar: {
-    height: 6,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#E5E7EB',
     overflow: 'hidden',
   },
@@ -297,8 +297,8 @@ const styles = StyleSheet.create({
   statItem: {
     flex: 1,
     minWidth: '45%',
-    padding: 16,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 16,
     alignItems: 'center',
   },
   statValue: {
@@ -312,10 +312,10 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     flexDirection: 'row',
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
-    gap: 12,
+    gap: 14,
     alignItems: 'flex-start',
   },
   infoText: {
