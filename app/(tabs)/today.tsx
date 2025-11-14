@@ -3,9 +3,9 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Platform } from 'react-native';
-import { Link } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Helper function to add opacity to hex colors
 const hexToRgba = (hex: string, alpha: number): string => {
