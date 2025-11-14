@@ -21,11 +21,6 @@ const fetchMigraineRisk = async (): Promise<{
   riskPercentage: number;
   factors: string[];
   message: string;
-  timeWindow: {
-    startTime: string; // e.g., "14:00" (2:00 PM)
-    endTime: string; // e.g., "16:00" (4:00 PM)
-    duration: number; // duration in hours
-  };
 }> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
@@ -36,11 +31,6 @@ const fetchMigraineRisk = async (): Promise<{
     riskPercentage: 45,
     factors: ['Weather changes', 'Stress levels elevated', 'Sleep quality decreased'],
     message: 'Your migraine risk is moderate today. Consider taking preventive measures.',
-    timeWindow: {
-      startTime: '14:00',
-      endTime: '16:00',
-      duration: 2,
-    },
   };
 };
 
@@ -91,6 +81,43 @@ const fetchRecommendedActions = async (): Promise<{
   };
 };
 
+const fetchWeeklyRiskForecast = async (): Promise<Array<{
+  date: string; // ISO date string
+  dayName: string; // e.g., "Monday"
+  dayNumber: number; // e.g., 15
+  monthName: string; // e.g., "January"
+  riskLevel: 'low' | 'medium' | 'high';
+  riskPercentage: number;
+}>> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Generate 3 days starting from today
+  const days = [];
+  const today = new Date();
+  
+  for (let i = 0; i < 3; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    
+    // Mock risk levels - varying for demonstration
+    const riskLevels: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
+    const riskPercentages = [25, 45, 70];
+    const riskIndex = i % 3;
+    
+    days.push({
+      date: date.toISOString().split('T')[0],
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNumber: date.getDate(),
+      monthName: date.toLocaleDateString('en-US', { month: 'short' }),
+      riskLevel: riskLevels[riskIndex],
+      riskPercentage: riskPercentages[riskIndex],
+    });
+  }
+  
+  return days;
+};
+
 export default function TodayScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
@@ -100,11 +127,6 @@ export default function TodayScreen() {
     riskPercentage: number;
     factors: string[];
     message: string;
-    timeWindow: {
-      startTime: string;
-      endTime: string;
-      duration: number;
-    };
   } | null>(null);
   const [recommendedActions, setRecommendedActions] = useState<Array<{
     id: string;
@@ -112,6 +134,14 @@ export default function TodayScreen() {
     description: string;
     icon: string;
     priority: 'high' | 'medium' | 'low';
+  }>>([]);
+  const [weeklyForecast, setWeeklyForecast] = useState<Array<{
+    date: string;
+    dayName: string;
+    dayNumber: number;
+    monthName: string;
+    riskLevel: 'low' | 'medium' | 'high';
+    riskPercentage: number;
   }>>([]);
   const [loading, setLoading] = useState(true);
 
@@ -131,12 +161,14 @@ export default function TodayScreen() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [riskResponse, actionsResponse] = await Promise.all([
+        const [riskResponse, actionsResponse, forecastResponse] = await Promise.all([
           fetchMigraineRisk(),
           fetchRecommendedActions(),
+          fetchWeeklyRiskForecast(),
         ]);
         setRiskData(riskResponse);
         setRecommendedActions(actionsResponse.actions);
+        setWeeklyForecast(forecastResponse);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -171,21 +203,6 @@ export default function TodayScreen() {
       default:
         return 'info.circle.fill';
     }
-  };
-
-  const formatTimeWindow = (startTime: string, endTime: string, duration: number): string => {
-    // Convert 24-hour format to 12-hour format
-    const formatTime = (time24: string): string => {
-      const [hours, minutes] = time24.split(':');
-      const hour = parseInt(hours, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const hour12 = hour % 12 || 12;
-      return `${hour12}:${minutes} ${ampm}`;
-    };
-
-    const start = formatTime(startTime);
-    const end = formatTime(endTime);
-    return `${start} - ${end} (${duration} ${duration === 1 ? 'hour' : 'hours'})`;
   };
 
   return (
@@ -232,39 +249,85 @@ export default function TodayScreen() {
                   <ThemedText style={{ ...styles.riskMessage, color: theme.text }}>
                     {riskData.message}
                   </ThemedText>
-                  <ThemedView style={styles.timeWindowContainer}>
-                    <IconSymbol name="clock.fill" size={16} color={getRiskColor(riskData.riskLevel)} />
-                    <ThemedView style={styles.timeWindowContent}>
-                      <ThemedText style={{ ...styles.timeWindowLabel, color: theme.text }}>
-                        Most likely time window:
-                      </ThemedText>
-                      <ThemedText style={{ ...styles.timeWindowValue, color: getRiskColor(riskData.riskLevel) }}>
-                        {formatTimeWindow(riskData.timeWindow.startTime, riskData.timeWindow.endTime, riskData.timeWindow.duration)}
-                      </ThemedText>
-                    </ThemedView>
-                  </ThemedView>
                 </ThemedView>
               </ThemedView>
             )}
 
-            {riskData && riskData.factors.length > 0 && (
+            {weeklyForecast.length > 0 && (
               <ThemedView style={styles.section}>
-                <ThemedText type="subtitle" style={styles.sectionTitle}>Contributing Factors</ThemedText>
+                <ThemedText type="subtitle" style={styles.sectionTitle}>3-Day Forecast</ThemedText>
                 <ThemedView
                   style={{
-                    ...styles.factorsCard,
+                    ...styles.calendarCard,
                     backgroundColor: theme.card,
                     borderColor: theme.cardBorder,
                   }}
                 >
-                  {riskData.factors.map((factor, index) => (
-                    <ThemedView key={index} style={styles.factorItem}>
-                      <IconSymbol name="circle.fill" size={6} color={getRiskColor(riskData.riskLevel)} />
-                      <ThemedText style={{ ...styles.factorText, color: theme.text }}>
-                        {factor}
-                      </ThemedText>
-                    </ThemedView>
-                  ))}
+                  {weeklyForecast.map((day, index) => {
+                    const isToday = index === 0;
+                    const riskColor = getRiskColor(day.riskLevel);
+                    return (
+                      <ThemedView
+                        key={day.date}
+                        style={{
+                          ...styles.calendarDay,
+                          ...(index !== weeklyForecast.length - 1 && {
+                            borderRightColor: theme.border,
+                            borderRightWidth: 1,
+                            marginRight: 12,
+                            paddingRight: 12,
+                          }),
+                        }}
+                      >
+                        <ThemedView style={styles.dayHeader}>
+                          <ThemedView style={styles.dayInfo}>
+                            <ThemedText style={{ ...styles.dayName, color: isToday ? theme.primary : theme.text }}>
+                              {day.dayName}
+                            </ThemedText>
+                            <ThemedText style={{ ...styles.dayDate, color: theme.textSecondary }}>
+                              {day.dayNumber}
+                            </ThemedText>
+                            {isToday && (
+                              <ThemedView
+                                style={{
+                                  ...styles.todayBadge,
+                                  backgroundColor: hexToRgba(theme.primary, 0.12),
+                                }}
+                              >
+                                <ThemedText style={{ ...styles.todayBadgeText, color: theme.primary }}>
+                                  Today
+                                </ThemedText>
+                              </ThemedView>
+                            )}
+                          </ThemedView>
+                        </ThemedView>
+                        <ThemedView style={styles.riskIndicator}>
+                          <ThemedView
+                            style={{
+                              ...styles.riskBar,
+                              backgroundColor: hexToRgba(riskColor, 0.15),
+                            }}
+                          >
+                            <ThemedView
+                              style={{
+                                ...styles.riskBarFill,
+                                width: `${day.riskPercentage}%`,
+                                backgroundColor: riskColor,
+                              }}
+                            />
+                          </ThemedView>
+                          <ThemedView style={styles.riskInfo}>
+                            <ThemedText style={{ ...styles.riskLabel, color: riskColor }}>
+                              {day.riskLevel.charAt(0).toUpperCase() + day.riskLevel.slice(1)}
+                            </ThemedText>
+                            <ThemedText style={{ ...styles.riskPercent, color: theme.textSecondary }}>
+                              {day.riskPercentage}%
+                            </ThemedText>
+                          </ThemedView>
+                        </ThemedView>
+                      </ThemedView>
+                    );
+                  })}
                 </ThemedView>
               </ThemedView>
             )}
@@ -447,23 +510,73 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  factorsCard: {
-    padding: 20,
+  calendarCard: {
+    flexDirection: 'row',
+    padding: 16,
     borderRadius: 20,
     borderWidth: 1,
+    gap: 0,
   },
-  factorItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
-    backgroundColor: "transparent",
-  },
-  factorText: {
-    fontSize: 15,
-    fontWeight: '500',
+  calendarDay: {
     flex: 1,
-    backgroundColor: "transparent",
+    alignItems: 'center',
+    gap: 8,
+  },
+  dayHeader: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  dayInfo: {
+    alignItems: 'center',
+    gap: 4,
+    width: '100%',
+  },
+  dayName: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  dayDate: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  todayBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  todayBadgeText: {
+    fontSize: 9,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  riskIndicator: {
+    width: '100%',
+    gap: 6,
+    alignItems: 'center',
+  },
+  riskBar: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  riskBarFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  riskInfo: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 2,
+  },
+  riskLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  riskPercent: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   section: {
     marginBottom: 24,
@@ -491,10 +604,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: "transparent",
   },
-  actionLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
+  actionContent: {
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  actionDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  priorityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  priorityText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   statsCard: {
     padding: 24,
@@ -517,9 +647,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     backgroundColor: "transparent",
   },
-  actionDescription: {
-    fontSize: 13,
-    lineHeight: 18,
+  statLabel: {
+    fontSize: 14,
     backgroundColor: "transparent",
   },
   statDivider: {
